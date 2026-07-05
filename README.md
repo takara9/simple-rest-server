@@ -58,7 +58,7 @@ docker run -d \
 2. バックエンドイメージをビルド
 
 ```bash
-docker build -t simple-rest-backend:latest .
+docker build --network=host -t simple-rest-backend:latest .
 ```
 
 3. バックエンドコンテナを起動
@@ -74,6 +74,28 @@ docker run --rm -p 5000:5000 \
 	--name simple-rest-backend \
 	simple-rest-backend:latest
 ```
+
+ビルド時の注意:
+- `Temporary failure in name resolution` が出る場合、上記の `--network=host` 付きビルドを使ってください。
+
+フロントエンドを Docker コンテナで実行する手順:
+1. フロントエンドイメージをビルド
+
+```bash
+docker build --network=host -t simple-rest-frontend:latest ./frontend
+```
+
+2. フロントエンドコンテナを起動
+
+```bash
+docker run --rm -p 5173:5173 \
+	--add-host=host.docker.internal:host-gateway \
+	-e VITE_API_PROXY_TARGET=http://host.docker.internal:5000 \
+	--name simple-rest-frontend \
+	simple-rest-frontend:latest
+```
+
+3. ブラウザで `http://127.0.0.1:5173` を開く
 
 補足:
 - `error: externally-managed-environment` が出る場合、システム環境に直接 pip install せず、上記の仮想環境を使ってください。
