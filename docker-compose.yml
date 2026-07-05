@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: my-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: yourpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/takara9/simple-rest-backend:latest
+    container_name: simple-rest-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: mydb
+      DB_USER: myuser
+      DB_PASSWORD: yourpassword
+      FLASK_DEBUG: "false"
+    ports:
+      - "5000:5000"
+
+  frontend:
+    image: ghcr.io/takara9/simple-rest-frontend:latest
+    container_name: simple-rest-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_PROXY_TARGET: http://backend:5000
+    ports:
+      - "5173:5173"
+
+volumes:
+  pgdata:

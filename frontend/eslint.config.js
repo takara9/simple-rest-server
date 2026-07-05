@@ -33,6 +33,7 @@ export default [
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
+      "no-unused-vars": ["error", { varsIgnorePattern: "^React$" }],
       "react/prop-types": "off",
       "react-hooks/exhaustive-deps": "off",
     },

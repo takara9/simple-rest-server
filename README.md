@@ -128,4 +128,40 @@ curl -X PUT http://localhost:5000/data -H "Content-Type: application/json" -d '{
 4. 削除
 curl -X DELETE http://localhost:5000/data -H "Content-Type: application/json" -d '{"id":1}'
 
+docker compose での起動方法:
+1. プロジェクトルートに移動
+
+```bash
+cd /home/ubuntu/simple-rest-server
+```
+
+2. 3サービス（postgres / backend / frontend）を起動
+
+```bash
+docker compose up -d
+```
+
+イメージを GHCR から最新化して起動する場合:
+
+```bash
+docker compose pull
+docker compose up -d --force-recreate
+```
+
+3. 起動状態を確認
+
+```bash
+docker compose ps
+```
+
+4. ブラウザで以下を開く
+- フロントエンド: `http://127.0.0.1:5173`
+- バックエンド API: `http://127.0.0.1:5000/data`
+
+5. 停止する場合
+
+```bash
+docker compose down
+```
+
 
