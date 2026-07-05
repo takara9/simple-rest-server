@@ -22,6 +22,13 @@ PostgreSQL 接続情報:
 - user: `myuser`
 - password: `yourpassword`
 
+バックエンド環境変数:
+- `DB_HOST` (default: `localhost`)
+- `DB_PORT` (default: `5432`)
+- `DB_NAME` (default: `mydb`)
+- `DB_USER` (default: `myuser`)
+- `DB_PASSWORD` (default: `yourpassword`)
+
 動作確認:
 - app.py の構文チェックは python3 で成功しています。
 
@@ -45,6 +52,28 @@ docker run -d \
 ```
 
 7. python app.py
+
+バックエンドを Docker コンテナで実行する手順:
+1. PostgreSQL コンテナを起動（上記コマンド）
+2. バックエンドイメージをビルド
+
+```bash
+docker build -t simple-rest-backend:latest .
+```
+
+3. バックエンドコンテナを起動
+
+```bash
+docker run --rm -p 5000:5000 \
+	--add-host=host.docker.internal:host-gateway \
+	-e DB_HOST=host.docker.internal \
+	-e DB_PORT=5432 \
+	-e DB_NAME=mydb \
+	-e DB_USER=myuser \
+	-e DB_PASSWORD=yourpassword \
+	--name simple-rest-backend \
+	simple-rest-backend:latest
+```
 
 補足:
 - `error: externally-managed-environment` が出る場合、システム環境に直接 pip install せず、上記の仮想環境を使ってください。

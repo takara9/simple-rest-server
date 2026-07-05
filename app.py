@@ -1,3 +1,5 @@
+import os
+
 import psycopg2
 
 from flask import Flask, jsonify, request
@@ -5,11 +7,11 @@ from handlers import handle_delete, handle_get, handle_post, handle_put
 
 app = Flask(__name__)
 DB_CONFIG = {
-    "dbname": "mydb",
-    "user": "myuser",
-    "password": "yourpassword",
-    "host": "localhost",
-    "port": 5432,
+    "dbname": os.getenv("DB_NAME", "mydb"),
+    "user": os.getenv("DB_USER", "myuser"),
+    "password": os.getenv("DB_PASSWORD", "yourpassword"),
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5432")),
 }
 
 
@@ -17,12 +19,12 @@ def init_db():
     with psycopg2.connect(**DB_CONFIG) as conn:
         with conn.cursor() as cur:
             cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS data (
-                id TEXT PRIMARY KEY,
-                text TEXT NOT NULL
-            )
-            """
+                """
+                CREATE TABLE IF NOT EXISTS data (
+                    id TEXT PRIMARY KEY,
+                    text TEXT NOT NULL
+                )
+                """
             )
         conn.commit()
 
@@ -51,4 +53,5 @@ init_db()
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    debug_mode = os.getenv("FLASK_DEBUG", "false").lower() == "true"
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
