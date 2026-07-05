@@ -13,7 +13,14 @@
 3. PUT /data
 4. DELETE /data
 - データ構造: id と text
-- 保存先: SQLite (`data.db`)
+- 保存先: PostgreSQL (`mydb.data`)
+
+PostgreSQL 接続情報:
+- host: `localhost`
+- port: `5432`
+- dbname: `mydb`
+- user: `myuser`
+- password: `yourpassword`
 
 動作確認:
 - app.py の構文チェックは python3 で成功しています。
@@ -24,7 +31,20 @@
 3. python3 -m venv .venv
 4. . .venv/bin/activate
 5. python -m pip install -r requirements.txt
-6. python app.py
+6. PostgreSQL コンテナを起動
+
+```bash
+docker run -d \
+	--name my-postgres \
+	-e POSTGRES_PASSWORD=yourpassword \
+	-e POSTGRES_USER=myuser \
+	-e POSTGRES_DB=mydb \
+	-p 5432:5432 \
+	-v pgdata:/var/lib/postgresql/data \
+	postgres:16
+```
+
+7. python app.py
 
 補足:
 - `error: externally-managed-environment` が出る場合、システム環境に直接 pip install せず、上記の仮想環境を使ってください。

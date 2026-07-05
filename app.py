@@ -1,32 +1,39 @@
-import sqlite3
+import psycopg2
 
 from flask import Flask, jsonify, request
 from handlers import handle_delete, handle_get, handle_post, handle_put
 
 app = Flask(__name__)
-DB_PATH = "data.db"
+DB_CONFIG = {
+    "dbname": "mydb",
+    "user": "myuser",
+    "password": "yourpassword",
+    "host": "localhost",
+    "port": 5432,
+}
 
 
 def init_db():
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute(
+    with psycopg2.connect(**DB_CONFIG) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
             """
             CREATE TABLE IF NOT EXISTS data (
                 id TEXT PRIMARY KEY,
                 text TEXT NOT NULL
             )
             """
-        )
+            )
         conn.commit()
 
 
 @app.route("/data", methods=["GET", "POST", "PUT", "DELETE"])
 def data_api():
     method_handlers = {
-        "GET": lambda: handle_get(DB_PATH),
-        "POST": lambda payload: handle_post(DB_PATH, payload),
-        "PUT": lambda payload: handle_put(DB_PATH, payload),
-        "DELETE": lambda payload: handle_delete(DB_PATH, payload),
+        "GET": lambda: handle_get(DB_CONFIG),
+        "POST": lambda payload: handle_post(DB_CONFIG, payload),
+        "PUT": lambda payload: handle_put(DB_CONFIG, payload),
+        "DELETE": lambda payload: handle_delete(DB_CONFIG, payload),
     }
 
     if request.method == "GET":
