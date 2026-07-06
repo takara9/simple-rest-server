@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const dataEndpoint = apiBaseUrl ? `${apiBaseUrl}/data` : "/data";
+
 function App() {
   const [items, setItems] = useState([]);
   const [formId, setFormId] = useState("");
@@ -23,7 +26,7 @@ function App() {
     setLoading(true);
     setError("");
     try {
-      const data = await requestJson("/data");
+      const data = await requestJson(dataEndpoint);
       setItems(data);
     } catch (e) {
       setError(e.message);
@@ -42,7 +45,7 @@ function App() {
     setError("");
 
     try {
-      await requestJson("/data", {
+      await requestJson(dataEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: formId, text: formText }),
@@ -62,7 +65,7 @@ function App() {
     setError("");
 
     try {
-      await requestJson("/data", {
+      await requestJson(dataEndpoint, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: itemId, text: newText }),
@@ -80,7 +83,7 @@ function App() {
     setError("");
 
     try {
-      await requestJson("/data", {
+      await requestJson(dataEndpoint, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: itemId }),

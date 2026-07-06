@@ -1,11 +1,23 @@
 import os
 
 import psycopg2
+from flask_cors import CORS
 
 from flask import Flask, jsonify, request
 from handlers import handle_delete, handle_get, handle_post, handle_put
 
 app = Flask(__name__)
+
+raw_allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
+allowed_origins = [origin.strip() for origin in raw_allowed_origins.split(",") if origin.strip()]
+
+CORS(
+    app,
+    resources={r"/data": {"origins": allowed_origins}},
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
+
 DB_CONFIG = {
     "dbname": os.getenv("DB_NAME", "mydb"),
     "user": os.getenv("DB_USER", "myuser"),
@@ -29,8 +41,11 @@ def init_db():
         conn.commit()
 
 
-@app.route("/data", methods=["GET", "POST", "PUT", "DELETE"])
+@app.route("/data", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def data_api():
+    if request.method == "OPTIONS":
+        return "", 204
+
     method_handlers = {
         "GET": lambda: handle_get(DB_CONFIG),
         "POST": lambda payload: handle_post(DB_CONFIG, payload),

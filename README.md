@@ -28,6 +28,10 @@ PostgreSQL 接続情報:
 - `DB_NAME` (default: `mydb`)
 - `DB_USER` (default: `myuser`)
 - `DB_PASSWORD` (default: `yourpassword`)
+- `CORS_ALLOWED_ORIGINS` (default: `*`, カンマ区切り)
+
+CORS 設定例（S3 Website からのアクセス許可）:
+- `CORS_ALLOWED_ORIGINS=http://takara-450041988467-ap-northeast-1-an.s3-website-ap-northeast-1.amazonaws.com`
 
 動作確認:
 - app.py の構文チェックは python3 で成功しています。
@@ -164,4 +168,28 @@ docker compose ps
 docker compose down
 ```
 
+S3 配信向けに API アドレスを変更してビルドする方法:
+1. `frontend/src/App.jsx` は `VITE_API_BASE_URL` を読む実装になっています。
+2. 以下のように API のベース URL を指定してビルドします（末尾に `/data` は付けない）。
 
+```bash
+cd /home/ubuntu/simple-rest-server/frontend
+VITE_API_BASE_URL=https://si-bf2f33478ce845f1aa3f7920f62e7fd7.ecs.ap-northeast-1.on.aws npm run build
+```
+
+3. 生成された `frontend/dist` を S3 へアップロードしてください。
+
+
+
+## メモ
+
+```
+sg-0de78feec0d792957
+
+database-1.czy22iewajnl.ap-northeast-1.rds.amazonaws.com
+
+curl -X POST https://si-bf2f33478ce845f1aa3f7920f62e7fd7.ecs.ap-northeast-1.on.aws/data -H "Content-Type: application/json" -d '{"id":1,"text":"hello"}'
+curl https://si-bf2f33478ce845f1aa3f7920f62e7fd7.ecs.ap-northeast-1.on.aws/data
+curl -X DELETE https://si-bf2f33478ce845f1aa3f7920f62e7fd7.ecs.ap-northeast-1.on.aws/data -H "Content-Type: application/json" -d '{"id":1}'
+curl -X DELETE https://si-bf2f33478ce845f1aa3f7920f62e7fd7.ecs.ap-northeast-1.on.aws/data -H "Content-Type: application/json" -d '{"id":2}'
+```
