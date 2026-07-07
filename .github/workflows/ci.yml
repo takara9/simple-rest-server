@@ -97,7 +97,7 @@ jobs:
       ECS_CLUSTER: default
       ECS_SERVICE: simple-rest-backend-432e
       ECS_TASK_DEFINITION_FAMILY: default-simple-rest-backend-432e
-      CONTAINER_NAME: backend
+      CONTAINER_NAME: Main
       IMAGE: ghcr.io/takara9/simple-rest-backend:${{ github.sha }}
 
     steps:
